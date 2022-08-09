@@ -6,22 +6,23 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 import plotly as py
 import plotly.graph_objs as go
+import numpy as np
 
 
 ###### Define your variables #####
-tabtitle = 'Titanic!'
+tabtitle = 'IMDb'
 color1='#92A5E8'
 color2='#8E44AD'
 color3='#FFC300'
 sourceurl = 'https://www.kaggle.com/c/titanic'
-githublink = 'https://github.com/plotly-dash-apps/304-titanic-dropdown'
+githublink = 'https://github.com/purnimavenkatram/304-titanic-dropdown.git'
 
 
 ###### Import a dataframe #######
-df = pd.read_csv("https://raw.githubusercontent.com/austinlasseter/plotly_dash_tutorial/master/00%20resources/titanic.csv")
-df['Female']=df['Sex'].map({'male':0, 'female':1})
-df['Cabin Class'] = df['Pclass'].map({1:'first', 2: 'second', 3:'third'})
-variables_list=['Survived', 'Female', 'Fare', 'Age']
+df = pd.read_csv("assets/imdb.csv")
+genres_to_keep=['Drama','Comedy','Action']
+df['genre_class']=np.where(df.genre.isin(genres_to_keep),df['genre'],'Other')
+variables_list=['Star Rating', 'Content Rating', 'Duration']
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -31,7 +32,7 @@ app.title=tabtitle
 
 ####### Layout of the app ########
 app.layout = html.Div([
-    html.H3('Choose a continuous variable for summary statistics:'),
+    html.H3('Choose a variable for summary statistics:'),
     dcc.Dropdown(
         id='dropdown',
         options=[{'label': i, 'value': i} for i in variables_list],
@@ -49,35 +50,42 @@ app.layout = html.Div([
 @app.callback(Output('display-value', 'figure'),
               [Input('dropdown', 'value')])
 def display_value(continuous_var):
-    grouped_mean=df.groupby(['Cabin Class', 'Embarked'])[continuous_var].mean()
+    grouped_mean=df.groupby(['genre_class'])[continuous_var].mean()
     results=pd.DataFrame(grouped_mean)
     # Create a grouped bar chart
     mydata1 = go.Bar(
-        x=results.loc['first'].index,
-        y=results.loc['first'][continuous_var],
-        name='First Class',
+        x=results.loc['Drama'].index,
+        y=results.loc['Drama'][continuous_var],
+        name='Drama',
         marker=dict(color=color1)
     )
     mydata2 = go.Bar(
-        x=results.loc['second'].index,
-        y=results.loc['second'][continuous_var],
-        name='Second Class',
+        x=results.loc['Comedy'].index,
+        y=results.loc['Comedy'][continuous_var],
+        name='Comedy',
         marker=dict(color=color2)
     )
     mydata3 = go.Bar(
-        x=results.loc['third'].index,
-        y=results.loc['third'][continuous_var],
-        name='Third Class',
+        x=results.loc['Action'].index,
+        y=results.loc['Action'][continuous_var],
+        name='Action',
         marker=dict(color=color3)
+    )
+
+    mydata4 = go.Bar(
+        x=results.loc['Other'].index,
+        y=results.loc['Other'][continuous_var],
+        name='Other',
+        marker=dict(color=color4)
     )
 
     mylayout = go.Layout(
         title='Grouped bar chart',
-        xaxis = dict(title = 'Port of Embarkation'), # x-axis label
+        xaxis = dict(title = 'Genre of Movies'), # x-axis label
         yaxis = dict(title = str(continuous_var)), # y-axis label
 
     )
-    fig = go.Figure(data=[mydata1, mydata2, mydata3], layout=mylayout)
+    fig = go.Figure(data=[mydata1, mydata2, mydata3, mydata4], layout=mylayout)
     return fig
 
 

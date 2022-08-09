@@ -22,7 +22,7 @@ githublink = 'https://github.com/purnimavenkatram/304-titanic-dropdown.git'
 df = pd.read_csv("assets/imdb.csv")
 genres_to_keep=['Drama','Comedy','Action']
 df['genre_class']=np.where(df.genre.isin(genres_to_keep),df['genre'],'Other')
-variables_list=['Star Rating', 'Content Rating', 'Duration']
+variables_list=['Star Rating', 'Duration']
 
 ########### Initiate the app
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -50,7 +50,7 @@ app.layout = html.Div([
 @app.callback(Output('display-value', 'figure'),
               [Input('dropdown', 'value')])
 def display_value(continuous_var):
-    grouped_mean=df.groupby(['genre_class'])[continuous_var].mean()
+    grouped_mean=df.groupby(['genre_class','Content Rating'])[continuous_var].mean()
     results=pd.DataFrame(grouped_mean)
     # Create a grouped bar chart
     mydata1 = go.Bar(

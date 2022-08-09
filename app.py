@@ -14,6 +14,7 @@ tabtitle = 'IMDb'
 color1='#92A5E8'
 color2='#8E44AD'
 color3='#FFC300'
+color4='#808080'
 sourceurl = 'https://www.kaggle.com/c/titanic'
 githublink = 'https://github.com/purnimavenkatram/304-titanic-dropdown.git'
 
